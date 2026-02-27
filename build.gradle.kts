@@ -1,3 +1,8 @@
+import org.khorum.oss.plugins.open.publishing.digitalocean.domain.uploadToDigitalOceanSpaces
+import org.khorum.oss.plugins.open.publishing.mavengenerated.domain.mavenGeneratedArtifacts
+import org.khorum.oss.plugins.open.secrets.getPropertyOrEnv
+import kotlin.apply
+
 plugins {
 	kotlin("jvm") version "2.3.0"
 	kotlin("plugin.spring") version "2.3.0"
@@ -19,6 +24,57 @@ version = file("VERSION").readText().trim()
 // Root project is not a Spring Boot application
 tasks.bootJar { enabled = false }
 tasks.jar { enabled = true }
+
+// Bridge Dokka v1 task names to v2 for maven-generated-artifacts plugin compatibility
+tasks.register("dokkaJavadoc") {
+	dependsOn("dokkaGeneratePublicationJavadoc")
+}
+tasks.register("dokkaHtml") {
+	dependsOn("dokkaGeneratePublicationHtml")
+}
+
+digitalOceanSpacesPublishing {
+	bucket = "open-reliquary"
+	accessKey = project.getPropertyOrEnv("spaces.key", "DO_SPACES_API_KEY")
+	secretKey = project.getPropertyOrEnv("spaces.secret", "DO_SPACES_SECRET")
+	publishedVersion = version.toString()
+	isPlugin = false
+	dryRun = false
+}
+
+tasks.uploadToDigitalOceanSpaces?.apply {
+	val task: Task = tasks.mavenGeneratedArtifacts ?: throw Exception("mavenGeneratedArtifacts task not found")
+	dependsOn(task)
+}
+
+mavenGeneratedArtifacts {
+	publicationName = "digitalOceanSpaces"
+	name = "Spektr Test"
+	description = """
+		A testing utilities library for Spektr APIs.
+	"""
+	websiteUrl = "https://github.com/khorum-oss/spektr-test/tree/main/src"
+
+	licenses {
+		license {
+			name = "MIT License"
+			url = "https://opensource.org/license/mit"
+		}
+	}
+
+	developers {
+		developer {
+			id = "khorum-oss"
+			name = "Khorum OSS Team"
+			email = "khorum.oss@gmail.com"
+			organization = "Khorum OSS"
+		}
+	}
+
+	scm {
+		connection.set("https://github.com/khorum-oss/spektr-test.git")
+	}
+}
 
 repositories {
 	mavenCentral()
