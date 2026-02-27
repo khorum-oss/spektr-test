@@ -25,6 +25,11 @@ version = file("VERSION").readText().trim()
 tasks.bootJar { enabled = false }
 tasks.jar { enabled = true }
 
+// Replace Dokka v2 compatibility shims with bridges to v2 tasks
+// (maven-generated-artifacts plugin depends on v1 task names)
+tasks.replace("dokkaJavadoc").dependsOn("dokkaGeneratePublicationJavadoc")
+tasks.replace("dokkaHtml").dependsOn("dokkaGeneratePublicationHtml")
+
 digitalOceanSpacesPublishing {
 	bucket = "open-reliquary"
 	accessKey = project.getPropertyOrEnv("spaces.key", "DO_SPACES_API_KEY")
