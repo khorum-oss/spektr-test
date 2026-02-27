@@ -1,0 +1,88 @@
+name: Merge Main - Bump & Publish
+run-name: Bump & Publish by ${{ github.actor }}
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      bump-version:
+        description: 'Bump the patch version before publishing'
+        type: boolean
+        default: true
+      custom-version:
+        description: 'Set a specific version (overrides bump). Leave empty to use bump or current version.'
+        type: string
+        default: ''
+
+concurrency:
+  group: merge-main
+  cancel-in-progress: false
+
+jobs:
+  version:
+    if: >-
+      github.event_name == 'push' ||
+      github.event.inputs.bump-version == 'true' ||
+      github.event.inputs.custom-version != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Determine version
+        id: version
+        env:
+          CUSTOM_VERSION: ${{ github.event.inputs.custom-version }}
+        run: |
+          OLD_VERSION=$(cat VERSION)
+          if [ -n "$CUSTOM_VERSION" ]; then
+            echo "$CUSTOM_VERSION" > VERSION
+            echo "new_version=$CUSTOM_VERSION" >> "$GITHUB_OUTPUT"
+          else
+            IFS='.' read -r major minor patch <<< "$OLD_VERSION"
+            patch=$((patch + 1))
+            NEW_VERSION="${major}.${minor}.${patch}"
+            echo "$NEW_VERSION" > VERSION
+            echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          fi
+          echo "old_version=$OLD_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Commit & push
+        env:
+          NEW_VERSION: ${{ steps.version.outputs.new_version }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+        run: |
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${APP_SLUG}[bot]@users.noreply.github.com"
+          git add VERSION
+          git diff --cached --quiet && echo "No version change" && exit 0
+          git commit -m "chore: bump version to ${NEW_VERSION} [skip ci]"
+          git push origin HEAD:main
+
+  publish:
+    needs: version
+    if: always() && !failure() && !cancelled()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout latest
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Java & Gradle
+        uses: violabs/public-cicd/.github/actions/setup-java-gradle@main
+        with:
+          java-version: '21'
+
+      - name: Publish to DigitalOcean Spaces
+        run: ./gradlew uploadToDigitalOceanSpaces --no-daemon
+        env:
+          DO_SPACES_API_KEY: ${{ secrets.DO_SPACES_API_KEY }}
+          DO_SPACES_SECRET: ${{ secrets.DO_SPACES_SECRET }}

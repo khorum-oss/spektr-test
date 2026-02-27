@@ -1,0 +1,35 @@
+name: PR Tests
+run-name: PR Tests by ${{ github.actor }}
+
+on:
+  pull_request:
+    branches:
+      - 'main'
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    uses: violabs/public-cicd/.github/workflows/gradle-build.yml@main
+    with:
+      java-version: '21'
+
+  test:
+    needs: build
+    uses: violabs/public-cicd/.github/workflows/gradle-unit-tests.yml@main
+    permissions:
+      contents: read
+      pull-requests: write
+    with:
+      java-version: '21'
+      coverage-enabled: true
+      min-coverage-overall: 80
+
+  detekt:
+    needs: build
+    uses: violabs/public-cicd/.github/workflows/gradle-detekt.yml@main
+    with:
+      java-version: '21'
