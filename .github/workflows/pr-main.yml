@@ -12,13 +12,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-check:
     uses: violabs/public-cicd/.github/workflows/gradle-build.yml@main
     with:
       java-version: '21'
 
-  test:
-    needs: build
+  detekt-check:
+    needs: build-check
+    uses: violabs/public-cicd/.github/workflows/gradle-detekt.yml@main
+    with:
+      java-version: '21'
+
+  unit-tests:
+    needs: detekt-check
     uses: violabs/public-cicd/.github/workflows/gradle-unit-tests.yml@main
     permissions:
       contents: read
@@ -26,10 +32,23 @@ jobs:
     with:
       java-version: '21'
       coverage-enabled: true
-      min-coverage-overall: 80
+      min-coverage-overall: 90
 
-  detekt:
-    needs: build
-    uses: violabs/public-cicd/.github/workflows/gradle-detekt.yml@main
+  notify-discord:
+    name: Notify Discord
+    needs:
+      - build-check
+      - unit-tests
+      - detekt-check
+    if: always()
+    uses: violabs/public-cicd/.github/workflows/notify-discord.yml@main
     with:
-      java-version: '21'
+      runs-on: ubuntu-latest
+      workflow_name: ${{ github.workflow }}
+      build_result: ${{ needs.build-check.result }}
+      test_result: ${{ needs.unit-tests.result }}
+      detekt_result: ${{ needs.detekt-check.result }}
+      pr_title: ${{ github.event.pull_request.title }}
+      pr_number: ${{ github.event.pull_request.number }}
+    secrets:
+      DISCORD_WEBHOOK_URL: ${{ secrets.PUBLIC_PR_DISCORD_WEBHOOK }}
