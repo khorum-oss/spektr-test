@@ -52,7 +52,7 @@ jobs:
     if: always()
     uses: violabs/public-cicd/.github/workflows/notify-discord.yml@main
     with:
-      runs-on: self-hosted
+      runs-on: ubuntu-latest
       workflow_name: ${{ github.workflow }}
       build_result: ${{ needs.publish.result == 'success' && 'success' || 'failure' }}
       version: ${{ needs.version.outputs.old-version || '' }}
