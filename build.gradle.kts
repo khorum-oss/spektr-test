@@ -5,9 +5,6 @@ import kotlin.apply
 
 plugins {
 	kotlin("jvm") version "2.3.0"
-	kotlin("plugin.spring") version "2.3.0"
-	id("org.springframework.boot") version "4.1.0-M1"
-	id("io.spring.dependency-management") version "1.1.7"
 	id("dev.detekt") version "2.0.0-alpha.2"
 	id("org.jetbrains.dokka") version "2.1.0"
 	id("org.jetbrains.dokka-javadoc") version "2.1.0"
@@ -20,10 +17,6 @@ plugins {
 
 group = "org.khorum.oss.spektr"
 version = file("VERSION").readText().trim()
-
-// Root project is not a Spring Boot application
-tasks.bootJar { enabled = false }
-tasks.jar { enabled = true }
 
 digitalOceanSpacesPublishing {
 	bucket = "open-reliquary"
@@ -84,22 +77,25 @@ dependencies {
 	api("org.testcontainers:testcontainers:2.0.3")
 	api("org.testcontainers:junit-jupiter:1.21.4")
 
-	// Spring Boot test support (WebFlux + Testcontainers integration)
-	api("org.springframework.boot:spring-boot-testcontainers")
-	api("org.springframework.boot:spring-boot-starter-webflux-test")
-	api("org.springframework.boot:spring-boot-starter-actuator-test")
+	// Spring dependencies — compileOnly so consumers provide their own version
+	compileOnly("org.springframework:spring-test:7.0.5")
+	compileOnly("org.springframework:spring-web:7.0.5")
+	compileOnly("org.springframework:spring-webflux:7.0.5")
 
 	// JUnit 5
 	api("org.jetbrains.kotlin:kotlin-test-junit5")
-	api("org.jetbrains.kotlinx:kotlinx-coroutines-test")
-	api("io.projectreactor:reactor-test")
+	api("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
 
 	api("io.mockk:mockk:1.13.8")
 
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+	testImplementation("org.springframework:spring-test:7.0.5")
+	testImplementation("org.springframework:spring-web:7.0.5")
+	testImplementation("org.springframework:spring-webflux:7.0.5")
+	testImplementation("io.projectreactor:reactor-test:3.7.6")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-	testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
+	testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
@@ -115,7 +111,7 @@ extensions.configure<kotlinx.kover.gradle.plugin.dsl.KoverProjectExtension> {
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion = JavaLanguageVersion.of(17)
 	}
 }
 
