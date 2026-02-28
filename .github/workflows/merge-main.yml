@@ -44,7 +44,7 @@ jobs:
       - name: Setup Java & Gradle
         uses: violabs/public-cicd/.github/actions/setup-java-gradle@main
         with:
-          java-version: '17'
+          java-version: '21'
 
       - name: Publish to DigitalOcean Spaces
         run: ./gradlew uploadToDigitalOceanSpaces --no-daemon

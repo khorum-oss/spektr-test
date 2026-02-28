@@ -15,13 +15,13 @@ jobs:
   build-check:
     uses: violabs/public-cicd/.github/workflows/gradle-build.yml@main
     with:
-      java-version: '17'
+      java-version: '21'
 
   detekt-check:
     needs: build-check
     uses: violabs/public-cicd/.github/workflows/gradle-detekt.yml@main
     with:
-      java-version: '17'
+      java-version: '21'
 
   unit-tests:
     needs: detekt-check
@@ -30,7 +30,7 @@ jobs:
       contents: read
       pull-requests: write
     with:
-      java-version: '17'
+      java-version: '21'
       coverage-enabled: true
       min-coverage-overall: 90
 
