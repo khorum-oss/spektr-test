@@ -12,7 +12,7 @@ plugins {
 	id("org.jetbrains.dokka") version "2.1.0"
 	id("org.jetbrains.dokka-javadoc") version "2.1.0"
 	id("org.jetbrains.kotlinx.kover") version "0.7.6"
-	id("org.khorum.oss.plugins.open.publishing.maven-generated-artifacts") version "1.0.0"
+	id("org.khorum.oss.plugins.open.publishing.maven-generated-artifacts") version "1.0.2"
 	id("org.khorum.oss.plugins.open.publishing.digital-ocean-spaces") version "1.0.0"
 	id("org.khorum.oss.plugins.open.secrets") version "1.0.0"
 	id("org.khorum.oss.plugins.open.pipeline") version "1.0.0"
@@ -24,11 +24,6 @@ version = file("VERSION").readText().trim()
 // Root project is not a Spring Boot application
 tasks.bootJar { enabled = false }
 tasks.jar { enabled = true }
-
-// Replace Dokka v2 compatibility shims with bridges to v2 tasks
-// (maven-generated-artifacts plugin depends on v1 task names)
-tasks.replace("dokkaJavadoc").dependsOn("dokkaGeneratePublicationJavadoc")
-tasks.replace("dokkaHtml").dependsOn("dokkaGeneratePublicationHtml")
 
 digitalOceanSpacesPublishing {
 	bucket = "open-reliquary"
