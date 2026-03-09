@@ -3,6 +3,54 @@
    <configuration>
       <verify-metadata>true</verify-metadata>
       <verify-signatures>true</verify-signatures>
+      <trusted-artifacts>
+         <trust group="gradle" name="gradle"/>
+         <trust group="^com[.]fasterxml($|([.].*))" regex="true"/>
+         <trust group="^com[.]github[.]docker-java($|([.].*))" regex="true"/>
+         <trust group="^com[.]google[.]code[.]gson($|([.].*))" regex="true"/>
+         <trust group="^com[.]google[.]errorprone($|([.].*))" regex="true"/>
+         <trust group="^com[.]soywiz($|([.].*))" regex="true"/>
+         <trust group="^com[.]squareup($|([.].*))" regex="true"/>
+         <trust group="^commons-codec($|([.].*))" regex="true"/>
+         <trust group="^commons-io($|([.].*))" regex="true"/>
+         <trust group="^commons-logging($|([.].*))" regex="true"/>
+         <trust group="^dev[.]detekt($|([.].*))" regex="true"/>
+         <trust group="^dev[.]drewhamilton($|([.].*))" regex="true"/>
+         <trust group="^io[.]github[.]detekt($|([.].*))" regex="true"/>
+         <trust group="^io[.]github[.]hakky54($|([.].*))" regex="true"/>
+         <trust group="^io[.]github[.]java-diff-utils($|([.].*))" regex="true"/>
+         <trust group="^io[.]github[.]microutils($|([.].*))" regex="true"/>
+         <trust group="^io[.]micrometer($|([.].*))" regex="true"/>
+         <trust group="^io[.]mockk($|([.].*))" regex="true"/>
+         <trust group="^io[.]netty($|([.].*))" regex="true"/>
+         <trust group="^io[.]projectreactor($|([.].*))" regex="true"/>
+         <trust group="^junit($|([.].*))" regex="true"/>
+         <trust group="^net[.]bytebuddy($|([.].*))" regex="true"/>
+         <trust group="^net[.]java[.]dev[.]jna($|([.].*))" regex="true"/>
+         <trust group="^org[.]apache($|([.].*))" regex="true"/>
+         <trust group="^org[.]apiguardian($|([.].*))" regex="true"/>
+         <trust group="^org[.]bouncycastle($|([.].*))" regex="true"/>
+         <trust group="^org[.]codehaus[.]woodstox($|([.].*))" regex="true"/>
+         <trust group="^org[.]freemarker($|([.].*))" regex="true"/>
+         <trust group="^org[.]hamcrest($|([.].*))" regex="true"/>
+         <trust group="^org[.]jcommander($|([.].*))" regex="true"/>
+         <trust group="^org[.]jetbrains($|([.].*))" regex="true"/>
+         <trust group="^org[.]jspecify($|([.].*))" regex="true"/>
+         <trust group="^org[.]jsoup($|([.].*))" regex="true"/>
+         <trust group="^org[.]junit($|([.].*))" regex="true"/>
+         <trust group="^org[.]khorum($|([.].*))" regex="true"/>
+         <trust group="^org[.]objenesis($|([.].*))" regex="true"/>
+         <trust group="^org[.]opentest4j($|([.].*))" regex="true"/>
+         <trust group="^org[.]reactivestreams($|([.].*))" regex="true"/>
+         <trust group="^org[.]rnorth($|([.].*))" regex="true"/>
+         <trust group="^org[.]slf4j($|([.].*))" regex="true"/>
+         <trust group="^org[.]snakeyaml($|([.].*))" regex="true"/>
+         <trust group="^org[.]sonatype($|([.].*))" regex="true"/>
+         <trust group="^org[.]sonarsource($|([.].*))" regex="true"/>
+         <trust group="^org[.]springframework($|([.].*))" regex="true"/>
+         <trust group="^org[.]testcontainers($|([.].*))" regex="true"/>
+         <trust group="^software[.]amazon($|([.].*))" regex="true"/>
+      </trusted-artifacts>
       <ignored-keys>
          <ignored-key id="012579464D01C06A" reason="Key couldn't be downloaded from any key server"/>
          <ignored-key id="03281AA0289FF53A" reason="Key couldn't be downloaded from any key server"/>
