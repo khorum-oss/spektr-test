@@ -13,7 +13,7 @@ on:
         default: true
 
 concurrency:
-  group: merge-main-v2
+  group: merge-main
   cancel-in-progress: false
 
 jobs:
@@ -51,6 +51,41 @@ jobs:
         env:
           DO_SPACES_API_KEY: ${{ secrets.DO_SPACES_API_KEY }}
           DO_SPACES_SECRET: ${{ secrets.DO_SPACES_SECRET }}
+          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+          GPG_SIGNING_PASSWORD: ${{ secrets.GPG_SIGNING_PASSWORD }}
+
+  coverage-and-sonar:
+    name: Coverage & SonarCloud (main baseline)
+    needs: publish
+    if: always() && needs.publish.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Java & Gradle
+        uses: violabs/public-cicd/.github/actions/setup-java-gradle@main
+        with:
+          java-version: '21'
+
+      - name: Generate Kover XML report
+        run: ./gradlew koverXmlReport --no-daemon
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: build/reports/kover/report.xml
+          fail_ci_if_error: false
+
+      - name: SonarCloud Scan
+        run: ./gradlew sonar --no-daemon
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   release:
     needs: [ version, publish ]
@@ -83,7 +118,7 @@ jobs:
 
   notify-discord:
     name: Notify Discord
-    needs: [ version, publish, release ]
+    needs: [ version, publish, release, coverage-and-sonar ]
     if: always()
     uses: violabs/public-cicd/.github/workflows/notify-discord.yml@main
     with:
