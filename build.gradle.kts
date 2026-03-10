@@ -19,6 +19,18 @@ plugins {
 group = "org.khorum.oss.spektr"
 version = file("VERSION").readText().trim()
 
+// Bridge Dokka v1 task names to v2 for maven-generated-artifacts plugin compatibility
+tasks.register("dokkaJavadoc") {
+	group = "documentation"
+	description = "Generate Javadoc API documentation"
+	dependsOn("dokkaGeneratePublicationJavadoc")
+}
+tasks.register("dokkaHtml") {
+	group = "documentation"
+	description = "Generate HTML API documentation"
+	dependsOn("dokkaGeneratePublicationHtml")
+}
+
 digitalOceanSpacesPublishing {
 	bucket = "open-reliquary"
 	accessKey = project.getPropertyOrEnv("spaces.key", "DO_SPACES_API_KEY")
